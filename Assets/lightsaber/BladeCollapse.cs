@@ -23,9 +23,9 @@ public class BladeCollapse : MonoBehaviour
     {
         xScale = transform.localScale.x;
         yScale = transform.localScale.z;
-        isOn = true;
+        isOn = false;
         maxScale = transform.localScale.y;
-        scale = maxScale;
+        scale = 0;
         lerp = maxScale / speed;
         idleAudio.volume = 0.3f;
     }
