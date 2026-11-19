@@ -20,6 +20,16 @@ public class LocomotionDefaults : MonoBehaviour
             moving.ControllerMovement.Value = MovingSetting.MovementStyle.Teleport;
         }
 
+        // The player capsule must stand on the outdoor ground (layer "Outdoor"), not just the room floor.
+        int outdoor = LayerMask.NameToLayer("Outdoor");
+        if (outdoor >= 0)
+        {
+            foreach (Oculus.Interaction.Locomotion.CharacterController cc in FindObjectsByType<Oculus.Interaction.Locomotion.CharacterController>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                cc.LayerMask = cc.LayerMask | (1 << outdoor);
+            }
+        }
+
         foreach (ComfortVignetteSetting comfort in FindObjectsByType<ComfortVignetteSetting>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             comfort.ComfortLevel.Value = ComfortVignetteSetting.ComfortAssistance.Low;

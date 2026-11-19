@@ -11213,13 +11213,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 132072541}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0.0029980254, y: 0.00000013889763, z: -0.008196699, w: 0.9999619}
   m_LocalPosition: {x: -2.75, y: 0.25, z: -7.575}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1242525112}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.344, y: 0.003, z: -0.939}
 --- !u!114 &132072543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14121,6 +14121,10 @@ PrefabInstance:
     - target: {fileID: 4588579565371434344, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
       propertyPath: m_Name
       value: Lightsaber
+      objectReference: {fileID: 0}
+    - target: {fileID: 4588579565371434344, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7011090405089549013, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
       propertyPath: isOn
@@ -159909,7 +159913,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-  solution: 030000000200000001000000
 --- !u!1 &1994186960
 GameObject:
   m_ObjectHideFlags: 0
@@ -171376,13 +171379,14 @@ GameObject:
   - component: {fileID: 6225425414819929899}
   - component: {fileID: 6225425414819929902}
   - component: {fileID: 6225425414819929901}
+  - component: {fileID: 6225425414819929903}
   m_Layer: 0
   m_Name: Baton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &3354316324006609442
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -171545,6 +171549,19 @@ MonoBehaviour:
   _kinematicWhileSelected: 1
   _throwWhenUnselected: 1
   _forceKinematicDisabled: 0
+--- !u!114 &6225425414819929903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3120832034246820413}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5843aa52f576f364cb24ec3dab45d718, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  targetObject: {fileID: 3120832034246820413}
 --- !u!4 &6277079991467314568
 Transform:
   m_ObjectHideFlags: 0

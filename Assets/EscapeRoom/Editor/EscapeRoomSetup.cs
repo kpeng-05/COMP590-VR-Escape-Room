@@ -380,7 +380,10 @@ public static class EscapeRoomSetup
             SetFloat(locomotor, "_jumpForce", 0f); // no jumping
 
         foreach (Oculus.Interaction.Locomotion.CharacterController cc in FindAll<Oculus.Interaction.Locomotion.CharacterController>())
+        {
             OrLayerMask(cc, "_layerMask", WallLayer);
+            OrLayerMask(cc, "_layerMask", OutdoorLayer); // the outdoor ground
+        }
 
         foreach (WallPenetrationTunneling wpt in FindAll<WallPenetrationTunneling>())
             OrLayerMask(wpt, "_layerMask", WallLayer);
