@@ -26522,7 +26522,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.24747476, y: 0.2615428, z: 0.4709364}
+  m_Size: {x: 0.24747476, y: 1, z: 1}
   m_Center: {x: -0.12373735, y: 0.1307714, z: 0.00045658648}
 --- !u!1 &306675345
 GameObject:
@@ -32887,7 +32887,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.24747467, y: 0.2615428, z: 0.4709363}
+  m_Size: {x: 0.24747467, y: 1, z: 1}
   m_Center: {x: -0.123737335, y: 0.1307714, z: 0.00045654178}
 --- !u!1 &383713653
 GameObject:
@@ -46653,7 +46653,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.24747467, y: 0.2615428, z: 0.4709363}
+  m_Size: {x: 0.24747467, y: 1, z: 1}
   m_Center: {x: -0.123737335, y: 0.1307714, z: 0.00045657158}
 --- !u!1 &558365003
 GameObject:
@@ -80569,7 +80569,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1036959442}
-  - component: {fileID: 1036959441}
   m_Layer: 0
   m_Name: Spawnable
   m_TagString: Untagged
@@ -80577,21 +80576,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1036959441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1036959440}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1114ba9fcecd3374ba9a8253bb232a80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ObjectSpawner
-  knight: {fileID: 667678745}
-  lightsaber: {fileID: 1994275249}
-  baton: {fileID: 3120832034246820413}
 --- !u!4 &1036959442
 Transform:
   m_ObjectHideFlags: 0
@@ -104789,7 +104773,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.24747467, y: 0.2615428, z: 0.4709363}
+  m_Size: {x: 0.24747467, y: 1, z: 1}
   m_Center: {x: -0.123737335, y: 0.1307714, z: 0.00045654178}
 --- !u!1 &1303836903
 GameObject:
