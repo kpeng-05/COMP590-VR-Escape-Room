@@ -8,26 +8,27 @@ public class ObjectSpawner : MonoBehaviour
 
     void Start()
     {
-        knight.SetActive(false);
-        lightsaber.SetActive(false);
-        baton.SetActive(false);
+        if (knight != null) knight.SetActive(false);
+        if (lightsaber != null) lightsaber.SetActive(false);
+        if (baton != null) baton.SetActive(false);
     }
 
     public void SpawnKnight()
     {
-        if (knight == null) return;
+        if (knight == null || knight.activeSelf) return;
         knight.SetActive(true);
     }
 
     public void SpawnLightsaber()
     {
-        if (lightsaber == null) return;
+        // Only spawn once, even if the robot code is solved again.
+        if (lightsaber == null || lightsaber.activeSelf) return;
         lightsaber.SetActive(true);
     }
 
     public void SpawnBaton()
     {
-        if (baton == null) return;
+        if (baton == null || baton.activeSelf) return;
         baton.SetActive(true);
     }
 }

@@ -1,11 +1,22 @@
 using UnityEngine;
 
+/// <summary>
+/// Light puzzle: when every lamp under this object is off, the digits appear and glow.
+/// Relighting any lamp hides them again. Lamps call UpdateNumbersVisibility() via ToggleableLight.
+/// </summary>
 public class RevealNumbersWhenDark : MonoBehaviour
 {
     [SerializeField] private GameObject numbers;
+    [SerializeField] private NumberGlow numberGlow;
     [SerializeField] private int lightsOnThreshold = 0;
 
     private Light[] childLights;
+
+    private void Awake()
+    {
+        childLights = GetComponentsInChildren<Light>(true);
+        if (numberGlow == null && numbers != null) numberGlow = numbers.GetComponent<NumberGlow>();
+    }
 
     private void Start()
     {
@@ -18,13 +29,7 @@ public class RevealNumbersWhenDark : MonoBehaviour
         UpdateNumbersVisibility();
     }
 
-    private void Awake()
-    {
-        childLights = GetComponentsInChildren<Light>(true);
-        UpdateNumbersVisibility();
-    }
-
-    // Call this whenever the room lights change.
+    // Called by ToggleableLight whenever a lamp changes.
     public void UpdateNumbersVisibility()
     {
         int lightsOn = 0;
@@ -37,6 +42,8 @@ public class RevealNumbersWhenDark : MonoBehaviour
             }
         }
 
-        numbers.SetActive(lightsOn <= lightsOnThreshold);
+        bool dark = lightsOn <= lightsOnThreshold;
+        if (numberGlow != null) numberGlow.SetGlow(dark);
+        if (numbers != null) numbers.SetActive(dark);
     }
 }

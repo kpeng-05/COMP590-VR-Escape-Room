@@ -1,30 +1,39 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class RobotSing : MonoBehaviour
+/// <summary>
+/// A robot the conductor baton can point at. Every hit (even mid-song) restarts its clip
+/// and reports this robot's Unity "order" number to the code controller (VerifySong).
+/// </summary>
+public class RobotSing : MonoBehaviour, IPointerTarget
 {
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip audioClip;
     [SerializeField] private int order;
 
     public UnityEvent<int> robotPlayed;
-    private bool shouldSing;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public int Order => order;
+
+    private void Awake()
     {
-        shouldSing = false;
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (audioSource != null) audioSource.playOnAwake = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnPointerHit(PointerTool tool, RaycastHit hit)
     {
-        if (shouldSing && !audioSource.isPlaying)
+        Sing();
+    }
+
+    public void Sing()
+    {
+        if (audioSource != null && audioClip != null)
         {
-            audioSource.PlayOneShot(audioClip);
-            shouldSing = false;
-            robotPlayed?.Invoke(order);
+            audioSource.Stop();
+            audioSource.clip = audioClip;
+            audioSource.Play();
         }
+        robotPlayed?.Invoke(order);
     }
 }

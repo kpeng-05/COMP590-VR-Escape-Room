@@ -5,12 +5,13 @@ public class BladeCollapse : MonoBehaviour
 {
     public float speed = 0.1f;
     bool isOn;
+    bool wantOn;
     float minScale = 0;
     float maxScale;
     float lerp;
     float scale;
     float xScale;
-    float yScale;   
+    float yScale;
     public GameObject blade;
 
     public AudioClip lightsaberOn;
@@ -18,33 +19,46 @@ public class BladeCollapse : MonoBehaviour
     public AudioSource activationAudio;
     public AudioSource idleAudio;
 
+    /// <summary>True while any part of the blade is extended. Wall tiles only cut when this is true.</summary>
+    public bool IsOn => isOn;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         xScale = transform.localScale.x;
         yScale = transform.localScale.z;
         isOn = false;
+        wantOn = false;
         maxScale = transform.localScale.y;
         scale = minScale;
-        lerp = maxScale / speed;
+        lerp = -Math.Abs(maxScale / speed);
         idleAudio.volume = 0.3f;
+    }
+
+    /// <summary>Ignite or retract the blade. Called by the lightsaber's PointerTool (trigger) or hilt button.</summary>
+    public void Toggle()
+    {
+        SetOn(!wantOn);
+    }
+
+    public void SetOn(bool on)
+    {
+        if (on == wantOn) return;
+        wantOn = on;
+        lerp = on ? Math.Abs(lerp) : -Math.Abs(lerp);
+        activationAudio.PlayOneShot(on ? lightsaberOn : lightsaberOff);
     }
 
     // Update is called once per frame
     void Update()
     {
+#if UNITY_EDITOR
+        // Keyboard shortcut for testing in the editor only.
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            lerp = isOn ? -Math.Abs(lerp) : Math.Abs(lerp);
-            if (!isOn)
-            {
-                activationAudio.PlayOneShot(lightsaberOn);
-            }
-            else
-            {
-                activationAudio.PlayOneShot(lightsaberOff);
-            }
+            Toggle();
         }
+#endif
 
         if (isOn && !activationAudio.isPlaying && !idleAudio.isPlaying)
         {
