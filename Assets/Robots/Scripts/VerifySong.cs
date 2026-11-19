@@ -1,53 +1,31 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// Robot "code" controller. Stores the last three robots hit, in hit order
-/// (index = order of interaction, value = robot's Unity order number; repeats allowed).
-/// The list is judged only when it holds three entries: correct = SpawnObject (the lightsaber), wrong = cleared.
-/// </summary>
 public class VerifySong : MonoBehaviour
 {
     [SerializeField] private UnityEvent SpawnObject;
-    [SerializeField] private int[] solution = { 3, 2, 1 };
 
-    private int[] entered;
-    private int count;
-    private bool solved;
-
-    public bool Solved => solved;
-
-    private void Awake()
+    private int lastToSing;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
-        entered = new int[solution.Length];
+        lastToSing = 0;
     }
 
-    // Wired to every RobotSing.robotPlayed event.
     public void ReceiveRobotOrder(int order)
     {
-        if (solved) return;
-
-        entered[count++] = order;
-        if (count < entered.Length) return;
-
-        bool correct = true;
-        for (int i = 0; i < entered.Length; i++)
+        if (order == lastToSing + 1)
         {
-            if (entered[i] != solution[i]) { correct = false; break; }
+            lastToSing = order;
+            if (lastToSing == 3)
+            {
+                SpawnObject.Invoke();
+                enabled = false;
+            }
         }
-
-        if (correct)
+        else
         {
-            solved = true;
-            SpawnObject?.Invoke();
+            lastToSing = 0;
         }
-        Clear();
-    }
-
-    public void Clear()
-    {
-        count = 0;
-        Array.Clear(entered, 0, entered.Length);
     }
 }
