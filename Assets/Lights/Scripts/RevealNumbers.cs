@@ -20,13 +20,7 @@ public class RevealNumbersWhenDark : MonoBehaviour
 
     private void Start()
     {
-        foreach (Light light in childLights)
-        {
-            light.gameObject.SetActive(true);
-            light.enabled = true;
-        }
-
-        UpdateNumbersVisibility();
+        EnableLights();
     }
 
     // Called by ToggleableLight whenever a lamp changes.
@@ -45,5 +39,16 @@ public class RevealNumbersWhenDark : MonoBehaviour
         bool dark = lightsOn <= lightsOnThreshold;
         if (numberGlow != null) numberGlow.SetGlow(dark);
         if (numbers != null) numbers.SetActive(dark);
+    }
+
+    public void EnableLights()
+    {
+        foreach (Light light in childLights)
+        {
+            light.gameObject.SetActive(true);
+            light.enabled = true;
+        }
+
+        UpdateNumbersVisibility();
     }
 }
