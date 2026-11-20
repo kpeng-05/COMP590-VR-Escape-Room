@@ -28,7 +28,7 @@ public class RobotSing : MonoBehaviour, IPointerTarget
     {
         if (audioSource != null && audioClip != null)
         {
-            audioSource.PlayOneShot(audioClip, 5.0f);
+            audioSource.PlayOneShot(audioClip, 2.0f);
         }
         robotPlayed?.Invoke(order);
     }
