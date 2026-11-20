@@ -1,7 +1,6 @@
 This project was tested on a Quest 3, so it is the recommended hardware to use.
 
-Video Link:
-to be filled in by kevin
+[Video Link](https://youtu.be/KEge8taVWDY)
 
 # Controls
 The hand controls are finicky at best. It is recommended to use the Quest 3 controllers.
