@@ -14121,13 +14121,17 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2808429680874541067, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 41c5cf1b3ea2ef44e879379f1c84444c, type: 2}
     - target: {fileID: 4588579565371434344, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
       propertyPath: m_Name
       value: Lightsaber
       objectReference: {fileID: 0}
     - target: {fileID: 4588579565371434344, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7011090405089549013, guid: 1d0d6dc4cf63d8c47881bcaabd358d79, type: 3}
       propertyPath: isOn
@@ -53884,9 +53888,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6787ad77cb7c3948840d79a88a0b6c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WhiteKnight
-  targetX: 3.5625
-  targetY: 1
-  targetZ: 3.3375
+  targetX: 2.387
+  targetY: 0.67
+  targetZ: 2.236
   onCorrectPlacement:
     m_PersistentCalls:
       m_Calls:
