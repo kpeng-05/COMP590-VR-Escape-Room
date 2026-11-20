@@ -16,9 +16,10 @@ public interface IPointerTarget
 /// Shared "held tool" behaviour for the wand, the baton and the lightsaber.
 /// While the object is grabbed, pressing the index trigger of the holding controller
 /// (or pinching with the holding hand when hand tracking is used) fires once.
-/// Raycast mode: casts one invisible ray from <see cref="tip"/> and notifies the first IPointerTarget hit.
-/// Activate mode: just raises <see cref="onFired"/> (used to toggle the lightsaber).
-/// No visuals and no haptics.
+/// Raycast mode: casts one ray from <see cref="tip"/>, shows it for 0.2 s as a thin white line (RayFlash)
+/// and notifies the first IPointerTarget hit.
+/// Activate mode: just raises <see cref="onFired"/> (used to toggle the lightsaber); no line.
+/// No haptics.
 /// </summary>
 public class PointerTool : MonoBehaviour
 {
@@ -33,6 +34,8 @@ public class PointerTool : MonoBehaviour
     [Tooltip("Layers that block the ray without being targets (walls, furniture).")]
     [SerializeField] private LayerMask occluderMask = 1 | (1 << 3);
     [SerializeField] private UnityEvent onFired = new UnityEvent();
+    [Tooltip("Line shown briefly when the ray is cast (Raycast mode). Created at runtime if empty.")]
+    [SerializeField] private RayFlash rayFlash;
 
     public UnityEvent OnFired => onFired;
 
@@ -65,6 +68,12 @@ public class PointerTool : MonoBehaviour
             if (mb is IInteractableView view) _views.Add(view);
         }
         if (tip == null) tip = transform;
+        if (mode == Mode.Raycast && rayFlash == null)
+        {
+            var go = new GameObject("RayFlash", typeof(LineRenderer));
+            go.transform.SetParent(transform, false);
+            rayFlash = go.AddComponent<RayFlash>();
+        }
     }
 
     private void Start()
@@ -112,6 +121,8 @@ public class PointerTool : MonoBehaviour
                 bestIndex = i;
             }
         }
+        Vector3 end = bestIndex >= 0 ? _hits[bestIndex].point : ray.origin + ray.direction * maxDistance;
+        if (rayFlash != null) rayFlash.Show(ray.origin, end);
         if (bestIndex < 0) return;
 
         RaycastHit hit = _hits[bestIndex];
