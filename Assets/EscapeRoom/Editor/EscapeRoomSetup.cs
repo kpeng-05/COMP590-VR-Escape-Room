@@ -76,6 +76,73 @@ public static class EscapeRoomSetup
         Debug.Log("[EscapeRoomSetup] Scene saved to " + _scene.path);
     }
 
+    /// <summary>
+    /// Adds only the time limit HUD, pointer ray lines and end-screen achievements to the open scene,
+    /// leaving everything else (room sizes, walls, puzzles) untouched.
+    /// </summary>
+    [MenuItem("Tools/Escape Room/Steps/Add Timer, Ray Lines, Achievements")]
+    public static void AddTimerRayAchievements()
+    {
+        if (!Prepare()) return;
+
+        GameFlow flow = Object.FindFirstObjectByType<GameFlow>(FindObjectsInactive.Include);
+        if (flow == null) { Debug.LogWarning("[EscapeRoomSetup] GameFlow not found; run Apply Full Setup instead."); return; }
+        GameObject flowGo = flow.gameObject;
+        ExitMonitor exit = flowGo.GetComponent<ExitMonitor>();
+        GameTimer timer = GetOrAdd<GameTimer>(flowGo);
+        AchievementTracker achievements = GetOrAdd<AchievementTracker>(flowGo);
+
+        SetRef(flow, "exitMonitor", exit);
+        SetRef(flow, "achievements", achievements);
+        SetRef(achievements, "robotPuzzle", FindAll<VerifySong>().FirstOrDefault());
+        SetRef(timer, "gameFlow", flow);
+        BuildTimerHud(FindInScene("[BuildingBlock] Camera Rig"), timer);
+
+        // End menu: grow to 1600 x 1100 and add the orange achievements list.
+        MenuPanel end = new SerializedObject(flow).FindProperty("endMenu").objectReferenceValue as MenuPanel;
+        if (end != null)
+        {
+            var rt = (RectTransform)end.transform;
+            rt.sizeDelta = new Vector2(1600f, 1100f);
+            float h = 1100f;
+            void Place(string child, float y)
+            {
+                var c = end.transform.Find(child) as RectTransform;
+                if (c != null) c.anchoredPosition = new Vector2(c.anchoredPosition.x, y);
+            }
+            Place("Title", h * 0.5f - 120f);
+            Place("Subtitle", h * 0.5f - 240f);
+            Place("PrimaryButton", -h * 0.5f + 150f);
+            Place("SecondaryButton", -h * 0.5f + 150f);
+
+            Transform oldList = end.transform.Find("Achievements");
+            if (oldList != null) Undo.DestroyObjectImmediate(oldList.gameObject);
+            TMP_Text list = MakeText(end.transform, "Achievements", "", 52f, Vector2.zero,
+                new Vector2(1400f, 380f), new Color32(255, 165, 0, 255));
+            list.gameObject.SetActive(false);
+            end.BindAchievements(list);
+            EditorUtility.SetDirty(end);
+        }
+        else Debug.LogWarning("[EscapeRoomSetup] GameFlow.endMenu not set; achievements list skipped.");
+
+        foreach (PointerTool tool in FindAll<PointerTool>())
+        {
+            if (new SerializedObject(tool).FindProperty("mode").enumValueIndex == (int)PointerTool.Mode.Raycast)
+                AddRayFlash(tool.gameObject, tool);
+        }
+
+        Finish("Timer, ray lines and achievements added. Review the scene, then save it (Ctrl+S).");
+    }
+
+    /// <summary>Batch-mode entry point: -executeMethod EscapeRoomSetup.AddTimerRayAchievementsBatch</summary>
+    public static void AddTimerRayAchievementsBatch()
+    {
+        EditorSceneManager.OpenScene("Assets/Scenes/EscapeRoom.unity", OpenSceneMode.Single);
+        AddTimerRayAchievements();
+        EditorSceneManager.SaveScene(_scene);
+        Debug.Log("[EscapeRoomSetup] Scene saved to " + _scene.path);
+    }
+
     [MenuItem("Tools/Escape Room/Steps/Rebuild Cuttable Walls")]
     public static void RebuildWallsOnly()
     {
@@ -314,7 +381,28 @@ public static class EscapeRoomSetup
 
         if (targetLayer >= 0) SetInt(tool, "targetMask", 1 << targetLayer);
         SetInt(tool, "occluderMask", (1 << 0) | (1 << WallLayer));
+
+        if (mode == PointerTool.Mode.Raycast) AddRayFlash(go, tool);
         return tool;
+    }
+
+    /// <summary>0.2 s white line shown each time the tool's ray is cast.</summary>
+    private static void AddRayFlash(GameObject go, PointerTool tool)
+    {
+        {
+            Transform flashT = GetOrCreateChild(go.transform, "RayFlash");
+            LineRenderer line = GetOrAdd<LineRenderer>(flashT.gameObject);
+            line.sharedMaterial = CreateUnlitMaterial("RayFlash", Color.white);
+            line.useWorldSpace = true;
+            line.positionCount = 2;
+            line.startWidth = line.endWidth = 0.003f;
+            line.startColor = line.endColor = Color.white;
+            line.shadowCastingMode = ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            line.enabled = false;
+            RayFlash flash = GetOrAdd<RayFlash>(flashT.gameObject);
+            SetRef(tool, "rayFlash", flash);
+        }
     }
 
     private static Material CreateLitMaterial(string name, Color color, Texture texture = null, Vector2? tiling = null)
@@ -334,6 +422,38 @@ public static class EscapeRoomSetup
             mat.SetTexture("_BaseMap", texture);
             mat.SetTextureScale("_BaseMap", tiling ?? Vector2.one);
         }
+        EditorUtility.SetDirty(mat);
+        return mat;
+    }
+
+    private static Material CreateUnlitMaterial(string name, Color color)
+    {
+        string path = $"{GeneratedDir}/{name}.mat";
+        Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (mat == null)
+        {
+            mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            AssetDatabase.CreateAsset(mat, path);
+        }
+        mat.SetColor("_BaseColor", color);
+        EditorUtility.SetDirty(mat);
+        return mat;
+    }
+
+    /// <summary>Copy of the default TMP font material that draws on top of everything (for the HUD).</summary>
+    private static Material CreateOverlayFontMaterial(string name)
+    {
+        string path = $"{GeneratedDir}/{name}.mat";
+        Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+        TMP_FontAsset font = Font();
+        if (mat == null && font != null)
+        {
+            mat = new Material(font.material);
+            AssetDatabase.CreateAsset(mat, path);
+        }
+        if (mat == null) return null;
+        Shader overlay = Shader.Find("TextMeshPro/Distance Field Overlay");
+        if (overlay != null) mat.shader = overlay;
         EditorUtility.SetDirty(mat);
         return mat;
     }
@@ -1014,6 +1134,8 @@ public static class EscapeRoomSetup
         flowGo.AddComponent<LocomotionDefaults>();
         GameFlow flow = flowGo.AddComponent<GameFlow>();
         ExitMonitor exit = flowGo.AddComponent<ExitMonitor>();
+        GameTimer timer = flowGo.AddComponent<GameTimer>();
+        AchievementTracker achievements = flowGo.AddComponent<AchievementTracker>();
 
         BuildLobby(flowGo.transform);
 
@@ -1040,7 +1162,12 @@ public static class EscapeRoomSetup
         MenuPanel start = BuildPanel(flowGo.transform, "StartMenu", "Title pending", "Play", "Quit",
             new Vector2(1600f, 900f), rt, startOrbit, spawn + new Vector3(0f, 1.5f, 2f), Quaternion.identity);
         MenuPanel end = BuildPanel(flowGo.transform, "EndMenu", "You Win", "Play Again", "Quit",
-            new Vector2(1600f, 900f), rt, endOrbit, Vector3.zero, Quaternion.identity);
+            new Vector2(1600f, 1100f), rt, endOrbit, Vector3.zero, Quaternion.identity);
+        TMP_Text achievementText = MakeText(end.transform, "Achievements", "", 52f, new Vector2(0f, 0f),
+            new Vector2(1400f, 380f), new Color32(255, 165, 0, 255));
+        achievementText.gameObject.SetActive(false);
+        end.BindAchievements(achievementText);
+        EditorUtility.SetDirty(end);
         MenuPanel leave = BuildPanel(flowGo.transform, "LeavePrompt", "Leave the room?", "Leave", "Keep exploring",
             new Vector2(1100f, 520f), null, null, Vector3.zero, Quaternion.identity);
         end.gameObject.SetActive(false);
@@ -1054,6 +1181,11 @@ public static class EscapeRoomSetup
         SetRef(flow, "endMenu", end);
         SetRef(flow, "roomStart", roomStart.transform);
         SetRef(flow, "walls", tracker);
+        SetRef(flow, "exitMonitor", exit);
+        SetRef(flow, "achievements", achievements);
+        SetRef(achievements, "robotPuzzle", FindAll<VerifySong>().FirstOrDefault());
+        SetRef(timer, "gameFlow", flow);
+        BuildTimerHud(rig, timer);
         SetRef(exit, "walls", tracker);
         SetRef(exit, "leavePrompt", leave);
         SetRef(exit, "gameFlow", flow);
@@ -1064,6 +1196,37 @@ public static class EscapeRoomSetup
         AddVoid(end, end.OnSecondary, flow.Quit);
         AddVoid(leave, leave.OnPrimary, exit.Leave);
         AddVoid(leave, leave.OnSecondary, exit.KeepExploring);
+    }
+
+    /// <summary>Head-locked countdown: world-space canvas under the CenterEyeAnchor, upper right of the view.</summary>
+    private static void BuildTimerHud(GameObject rig, GameTimer timer)
+    {
+        Transform eye = rig != null ? rig.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "CenterEyeAnchor") : null;
+        if (eye == null) { Debug.LogWarning("[EscapeRoomSetup] CenterEyeAnchor not found; timer HUD skipped."); return; }
+
+        Transform old = eye.Find("TimerHUD");
+        if (old != null) Undo.DestroyObjectImmediate(old.gameObject);
+
+        var go = new GameObject("TimerHUD", typeof(RectTransform));
+        Undo.RegisterCreatedObjectUndo(go, "TimerHUD");
+        go.transform.SetParent(eye, false);
+        Vector3 offset = new Vector3(0.30f, 0.20f, 1.0f); // ~17 deg right, ~11 deg up, 1 m out
+        go.transform.localPosition = offset;
+        go.transform.localRotation = Quaternion.LookRotation(offset.normalized, Vector3.up);
+        go.transform.localScale = Vector3.one * 0.001f; // 1 px = 1 mm
+        Canvas canvas = go.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.sortingOrder = 100;
+        ((RectTransform)go.transform).sizeDelta = new Vector2(300f, 100f);
+
+        TMP_Text label = MakeText(go.transform, "Countdown", "10:00", 60f, Vector2.zero, new Vector2(300f, 100f), new Color32(255, 0, 0, 255));
+        label.raycastTarget = false;
+        Material overlay = CreateOverlayFontMaterial("TimerOverlay");
+        if (overlay != null) label.fontSharedMaterial = overlay;
+
+        SetRef(timer, "hud", go);
+        SetRef(timer, "label", label);
+        go.SetActive(false);
     }
 
     private static void ProjectSettingsFixes()

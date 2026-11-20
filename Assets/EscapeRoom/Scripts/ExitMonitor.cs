@@ -56,6 +56,13 @@ public class ExitMonitor : MonoBehaviour
         gameFlow.Win();
     }
 
+    /// <summary>Closes the prompt without leaving (used when the game ends another way, e.g. time up).</summary>
+    public void HidePrompt()
+    {
+        _open = false;
+        if (leavePrompt != null) leavePrompt.Hide();
+    }
+
     // Prompt "Keep exploring".
     public void KeepExploring()
     {

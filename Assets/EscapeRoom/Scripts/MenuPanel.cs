@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,6 +14,8 @@ public class MenuPanel : MonoBehaviour
     [SerializeField] private TMP_Text subtitle;
     [SerializeField] private TMP_Text primaryLabel;
     [SerializeField] private TMP_Text secondaryLabel;
+    [Tooltip("Optional list of earned achievements (end menu only).")]
+    [SerializeField] private TMP_Text achievementsText;
     [SerializeField] private MenuOrbitCamera orbitCamera;
     [SerializeField] private UnityEvent onPrimary = new UnityEvent();
     [SerializeField] private UnityEvent onSecondary = new UnityEvent();
@@ -29,6 +32,25 @@ public class MenuPanel : MonoBehaviour
         primaryLabel = primary;
         secondaryLabel = secondary;
         orbitCamera = orbit;
+    }
+
+    public void BindAchievements(TMP_Text text)
+    {
+        achievementsText = text;
+    }
+
+    public void SetTitle(string text)
+    {
+        if (title != null && !string.IsNullOrEmpty(text)) title.text = text;
+    }
+
+    /// <summary>Shows "Achievements" and one earned title per line; hides the block when the list is empty.</summary>
+    public void SetAchievements(IList<string> earned)
+    {
+        if (achievementsText == null) return;
+        bool any = earned != null && earned.Count > 0;
+        achievementsText.gameObject.SetActive(any);
+        if (any) achievementsText.text = "Achievements\n" + string.Join("\n", earned);
     }
 
     public void SetSubtitle(string text)
