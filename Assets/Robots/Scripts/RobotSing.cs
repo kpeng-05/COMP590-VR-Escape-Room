@@ -12,6 +12,7 @@ public class RobotSing : MonoBehaviour, IPointerTarget
     [SerializeField] private int order;
 
     public UnityEvent<int> robotPlayed;
+    public int Order => order;
 
     private void Awake()
     {
