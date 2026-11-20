@@ -13,12 +13,9 @@ public class RobotSing : MonoBehaviour, IPointerTarget
 
     public UnityEvent<int> robotPlayed;
 
-    public int Order => order;
-
     private void Awake()
     {
-        if (audioSource == null) audioSource = GetComponent<AudioSource>();
-        if (audioSource != null) audioSource.playOnAwake = false;
+        audioSource.playOnAwake = false;
     }
 
     public void OnPointerHit(PointerTool tool, RaycastHit hit)
@@ -30,9 +27,7 @@ public class RobotSing : MonoBehaviour, IPointerTarget
     {
         if (audioSource != null && audioClip != null)
         {
-            audioSource.Stop();
-            audioSource.clip = audioClip;
-            audioSource.Play();
+            audioSource.PlayOneShot(audioClip, 5.0f);
         }
         robotPlayed?.Invoke(order);
     }

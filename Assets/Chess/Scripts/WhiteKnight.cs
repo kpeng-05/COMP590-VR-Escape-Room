@@ -42,6 +42,7 @@ public class WhiteKnight : MonoBehaviour
         {
             if (mb is IInteractableView view) _views.Add(view);
         }
+        gameObject.SetActive(false);
     }
 
     private void Start()
