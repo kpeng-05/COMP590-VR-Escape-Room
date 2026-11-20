@@ -32,7 +32,9 @@ public class BladeCollapse : MonoBehaviour
         maxScale = transform.localScale.y;
         scale = minScale;
         lerp = -Math.Abs(maxScale / speed);
-        idleAudio.volume = 0.3f;
+
+        idleAudio.volume = 0.1f;
+        activationAudio.volume = 0.5f;
     }
 
     /// <summary>Ignite or retract the blade. Called by the lightsaber's PointerTool (trigger) or hilt button.</summary>
